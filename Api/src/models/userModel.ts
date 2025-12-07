@@ -1,9 +1,11 @@
 import { Schema, model, Document } from "mongoose";
+import bcrypt from "bcrypt";
 
 export interface IUser {
     userName: string
     email: string
     password: string
+    isActive: boolean
 }
 
 export interface IUserModel extends IUser, Document { }
@@ -18,6 +20,7 @@ const userSchema = new Schema<IUserModel>({
         trim: true,
     },
     password: { type: String, required: true },
+    isActive: { type: Boolean, default: true },
 }, { timestamps: true })
 
 

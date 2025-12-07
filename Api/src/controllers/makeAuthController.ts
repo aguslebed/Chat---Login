@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
 import { authService } from "../services/authService";
+import { RegistrationValidator } from "../validators/userValidator";
 
 export const makeAuthController = ({ authService }: { authService: authService }) => {
 
     async function register(req: Request, res: Response) {
         try {
             const { email, password, userName } = req.body;
-            const user = await authService.register(email, password, userName);
-            res.status(201).json(user);
+            console.log(email, password, userName)
+            RegistrationValidator(req, res, async () => {
+                const user = await authService.register(email, password, userName);
+                res.status(201).json(user);
+            });
         } catch (error) {
             res.status(500).json({ error: "Error al registrar el usuario" });
         }
