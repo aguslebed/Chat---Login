@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { authService } from "../services/authService";
 import { RegistrationValidator } from "../validators/userValidator";
+import { LoginValidator } from "../validators/loginValidator";
+import { userFormatter } from "../formatter/userFormatter";
 
 export const makeAuthController = ({ authService }: { authService: authService }) => {
 
@@ -18,7 +20,18 @@ export const makeAuthController = ({ authService }: { authService: authService }
     }
 
     async function login(req: Request, res: Response) {
-        res.send("login");
+        try {
+            const { email, password } = req.body;
+            console.log(req.body)
+            LoginValidator(req, res, async () => {
+                const user = await authService.login(email, password);
+                const formattedUser = userFormatter(user.user);
+                const token = user.token;
+                res.status(200).json({ user: formattedUser, token: token });
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error al iniciar sesión" });
+        }
     }
 
     async function logout(req: Request, res: Response) {
