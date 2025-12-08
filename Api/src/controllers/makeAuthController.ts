@@ -39,7 +39,17 @@ export const makeAuthController = ({ authService }: { authService: authService }
     }
 
     async function me(req: Request, res: Response) {
-        res.send("me");
+        try {
+            const loggedUser = req.user;
+            if (!loggedUser) {
+                throw new Error("User not found");
+            }
+            const user = await authService.getMe(loggedUser.id);
+            const formattedUser = userFormatter(user);
+            res.status(200).json({ user: formattedUser });
+        } catch (error) {
+            res.status(500).json({ error: "Error al obtener el usuario" });
+        }
     }
 
 

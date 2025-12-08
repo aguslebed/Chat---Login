@@ -1,8 +1,9 @@
-import { IUser } from "../models/userModel";
+import { IUserModel } from "../models/userModel";
 
 
-export const userFormatter = (user: IUser) => {
+export const userFormatter = (user: IUserModel) => {
     return {
+        id: user._id.toString(),
         email: user.email,
         userName: user.userName,
         isActive: user.isActive,

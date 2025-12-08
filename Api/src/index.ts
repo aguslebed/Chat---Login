@@ -2,11 +2,13 @@ import "dotenv/config";
 import express from "express";
 import authRoutes from "./routes/authRoutes"
 import connectDB from "./config/db";
+import morgan from "morgan";
 
 const app = express();
 
 connectDB();
 
+app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 

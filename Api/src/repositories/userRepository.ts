@@ -1,7 +1,7 @@
 import { IUser, IUserModel, userModel } from "../models/userModel";
 
 export class UserRepository {
-    async create(user: IUser): Promise<IUserModel> {
+    async create(user: Omit<IUser, "_id">): Promise<IUserModel> {
         return await userModel.create(user);
     }
 
@@ -14,7 +14,7 @@ export class UserRepository {
     }
 
     async findById(id: string): Promise<IUserModel | null> {
-        return await userModel.findById(id, { isActive: true });
+        return await userModel.findOne({ _id: id, isActive: true });
     }
 
     async delete(id: string): Promise<IUserModel | null> {

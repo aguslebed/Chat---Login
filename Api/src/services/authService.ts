@@ -11,7 +11,7 @@ export class authService extends IAuthService {
         this.userRepository = new UserRepository();
     }
 
-    async register(email: string, password: string, userName: string): Promise<IUser> {
+    async register(email: string, password: string, userName: string): Promise<IUserModel> {
         try {
 
             const findByUserName = await this.userRepository.findByUserName(userName);
@@ -27,7 +27,7 @@ export class authService extends IAuthService {
 
 
             const hashPassword = await bcrypt.hash(password, 10);
-            const user: IUser = {
+            const user: Omit<IUser, "_id"> = {
                 email: email.toLowerCase(),
                 password: hashPassword,
                 userName,
@@ -52,6 +52,18 @@ export class authService extends IAuthService {
             }
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
             return { user, token };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getMe(id: string): Promise<IUserModel> {
+        try {
+            const user = await this.userRepository.findById(id);
+            if (!user) {
+                throw new Error("User not found");
+            }
+            return user;
         } catch (error) {
             throw error;
         }

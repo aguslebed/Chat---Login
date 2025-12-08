@@ -6,9 +6,10 @@ export interface IUser {
     email: string
     password: string
     isActive: boolean
+    _id: string
 }
 
-export interface IUserModel extends IUser, Document { }
+export interface IUserModel extends Omit<IUser, "_id">, Document { }
 
 const userSchema = new Schema<IUserModel>({
     userName: { type: String, required: true },
