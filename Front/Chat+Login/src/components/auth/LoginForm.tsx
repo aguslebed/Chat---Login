@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { login } from '../../request';
 
 const LoginIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -18,13 +19,17 @@ const LockIcon = () => (
     </svg>
 );
 
-export default function LoginForm({ onSwitchToRegister, onForgotPassword }: { onSwitchToRegister: () => void, onForgotPassword: () => void }) {
+export default function LoginForm({ onSwitchToRegister, onForgotPassword, onLoginSuccess }: { onSwitchToRegister: () => void, onForgotPassword: () => void, onLoginSuccess: (data: any) => void }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Login attempt:', { email, password });
+
+        const response = await login(email, password);
+        if (response && response.token) {
+            onLoginSuccess(response);
+        }
     };
 
     return (

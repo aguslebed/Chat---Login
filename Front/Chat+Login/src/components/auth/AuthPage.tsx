@@ -5,8 +5,13 @@ import ForgotPasswordForm from './ForgotPasswordForm';
 
 type AuthView = 'login' | 'register' | 'forgot-password';
 
-export default function AuthPage() {
+export default function AuthPage({ onLoginSuccess }: { onLoginSuccess: (user: any) => void }) {
     const [view, setView] = useState<AuthView>('login');
+
+    const handleLoginSuccess = (data: any) => {
+        // You might want to store user info here or pass it up
+        onLoginSuccess(data);
+    };
 
     return (
         <div className="min-h-screen w-full flex bg-[#1a1a1a]">
@@ -33,6 +38,7 @@ export default function AuthPage() {
                         <LoginForm
                             onSwitchToRegister={() => setView('register')}
                             onForgotPassword={() => setView('forgot-password')}
+                            onLoginSuccess={handleLoginSuccess}
                         />
                     )}
                     {view === 'register' && (
