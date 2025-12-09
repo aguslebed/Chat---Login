@@ -5,4 +5,6 @@ export class IAuthService {
     async login(email: string, password: string): Promise<{ user: IUserModel, token: string }> { throw new Error("Method not implemented"); };
     async logout(): Promise<void> { throw new Error("Method not implemented"); };
     async me(): Promise<IUserModel> { throw new Error("Method not implemented"); };
+    async getUsers(): Promise<IUserModel[]> { throw new Error("Method not implemented"); };
+    async getGuest(): Promise<{ user: IUserModel, token: string }> { throw new Error("Method not implemented"); };
 }

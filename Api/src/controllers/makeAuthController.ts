@@ -36,7 +36,15 @@ export const makeAuthController = ({ authService }: { authService: authService }
                     const user = await authService.login(email, password);
                     const formattedUser = userFormatter(user.user);
                     const token = user.token;
-                    res.status(200).json({ user: formattedUser, token: token });
+
+                    res.cookie('token', token, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'lax', // or 'strict' if on same domain
+                        maxAge: 24 * 60 * 60 * 1000 // 1 day
+                    });
+
+                    res.status(200).json({ user: formattedUser }); // Token is no longer in body
                 } catch (error: any) {
                     if (error.message === "User not found" || error.message === "Invalid password") {
                         res.status(401).json({ error: "Invalid credentials" });
@@ -51,7 +59,8 @@ export const makeAuthController = ({ authService }: { authService: authService }
     }
 
     async function logout(req: Request, res: Response) {
-        res.send("logout");
+        res.clearCookie('token');
+        res.status(200).json({ message: "Logged out successfully" });
     }
 
     async function me(req: Request, res: Response) {
@@ -68,11 +77,33 @@ export const makeAuthController = ({ authService }: { authService: authService }
         }
     }
 
+    async function getUsers(req: Request, res: Response) {
+        try {
+            const users = await authService.getUsers();
+            const formattedUsers = users.map(userFormatter);
+            res.status(200).json({ users: formattedUsers });
+        } catch (error) {
+            res.status(500).json({ error: "Error al obtener los usuarios" });
+        }
+    }
+
+    async function guestLogin(req: Request, res: Response) {
+        try {
+            const user = await authService.getGuest();
+            const formattedUser = userFormatter(user.user);
+            res.status(200).json({ user: formattedUser, token: user.token });
+        } catch (error) {
+            res.status(500).json({ error: "Error al obtener el usuario" });
+        }
+    }
+
 
     return {
         register,
         login,
         logout,
-        me
+        me,
+        getUsers,
+        guestLogin
     }
 }

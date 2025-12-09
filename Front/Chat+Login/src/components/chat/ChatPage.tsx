@@ -13,6 +13,14 @@ interface ChatPageProps {
     onLogout?: () => void;
 }
 
+export interface Message {
+    id: number;
+    user: string;
+    text: string;
+    time: string;
+    isMe: boolean;
+}
+
 export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     // State for tabs. 'global' is always there.
@@ -20,6 +28,29 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
     const [openChats, setOpenChats] = useState<{ id: string | number, name: string }[]>([
         { id: 'global', name: 'Global Chat' }
     ]);
+
+
+    const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({
+        'global': [
+            { id: 1, user: 'Alice', text: 'Hey everyone!', time: '10:00 AM', isMe: false },
+            { id: 2, user: 'Me', text: 'Hi Alice! How are you?', time: '10:02 AM', isMe: true },
+        ]
+    });
+
+    const handleSendMessage = (text: string) => {
+        const newMessage: Message = {
+            id: Date.now(),
+            user: 'Me', // You might want to use currentUser.userName here if available
+            text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isMe: true
+        };
+
+        setMessagesByChat(prev => ({
+            ...prev,
+            [activeChat]: [...(prev[activeChat] || []), newMessage]
+        }));
+    };
 
     const handleUserClick = (user: any) => {
         if (!openChats.find(c => c.id === user.id)) {
@@ -116,7 +147,10 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
 
                 {/* Chat Area */}
                 <div className="flex-1 overflow-hidden relative">
-                    <ChatArea activeChat={activeChat} />
+                    <ChatArea
+                        messages={messagesByChat[activeChat] || []}
+                        onSendMessage={handleSendMessage}
+                    />
                 </div>
             </div>
         </div>

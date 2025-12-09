@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { register } from '../../request';
 
 const UserIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -27,9 +28,22 @@ export default function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () 
         confirmPassword: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Register attempt:', formData);
+
+        if (formData.password !== formData.confirmPassword) {
+            alert("Passwords don't match!");
+            return;
+        }
+
+        const result = await register(formData.email, formData.password, formData.username);
+
+        if (result && !result.error) {
+            alert('Registration successful! Please login.');
+            onSwitchToLogin();
+        } else {
+            alert(result?.error || 'Registration failed');
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

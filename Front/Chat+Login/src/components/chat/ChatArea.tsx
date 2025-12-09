@@ -7,24 +7,12 @@ const SendIcon = () => (
 );
 
 interface ChatAreaProps {
-    activeChat: string | number;
+    messages: any[];
+    onSendMessage: (message: string) => void;
 }
 
-const ChatArea = ({ activeChat }: ChatAreaProps) => {
+const ChatArea = ({ messages, onSendMessage }: ChatAreaProps) => {
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState<any[]>([]);
-
-    useEffect(() => {
-        // Reset messages when active chat changes (Mock behavior)
-        if (activeChat === 'global') {
-            setMessages([
-                { id: 1, user: 'Alice', text: 'Hey everyone!', time: '10:00 AM', isMe: false },
-                { id: 2, user: 'Me', text: 'Hi Alice! How are you?', time: '10:02 AM', isMe: true },
-            ]);
-        } else {
-            setMessages([]); // Empty for private chats for now
-        }
-    }, [activeChat]);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,13 +28,7 @@ const ChatArea = ({ activeChat }: ChatAreaProps) => {
         e.preventDefault();
         if (!message.trim()) return;
 
-        setMessages([...messages, {
-            id: Date.now(),
-            user: 'Me',
-            text: message,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isMe: true
-        }]);
+        onSendMessage(message);
         setMessage('');
     };
 

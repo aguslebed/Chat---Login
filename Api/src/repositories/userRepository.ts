@@ -21,6 +21,9 @@ export class UserRepository {
         return await userModel.findByIdAndDelete(id);
     }
 
+    async findAll(): Promise<IUserModel[]> {
+        return await userModel.find({ isActive: true });
+    }
 
 }
 

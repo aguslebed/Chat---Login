@@ -7,6 +7,7 @@ export interface IUser {
     password: string
     isActive: boolean
     _id: string
+    isGuest?: boolean
 }
 
 export interface IUserModel extends Omit<IUser, "_id">, Document { }

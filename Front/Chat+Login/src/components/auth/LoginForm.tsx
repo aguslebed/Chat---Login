@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { login } from '../../request';
+import { login, guestLogin } from '../../request';
 
 const LoginIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -23,11 +23,14 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onLogi
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+
+    const handleSubmit = async (e: React.FormEvent | React.MouseEvent, guest?: boolean) => {
         e.preventDefault();
 
-        const response = await login(email, password);
-        if (response && response.token) {
+        const response = guest ? await guestLogin() : await login(email, password);
+
+        if (response && (response.user || response.guest)) {
+            console.log(response)
             onLoginSuccess(response);
         }
     };
@@ -104,7 +107,9 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onLogi
                         </svg>
                         Google
                     </button>
-                    <button className="flex items-center justify-center px-4 py-2 border border-gray-700 rounded-xl bg-gray-800/30 hover:bg-gray-800 text-white transition-all hover:border-gray-600 cursor-pointer">
+                    <button className="flex items-center justify-center px-4 py-2 border border-gray-700 rounded-xl bg-gray-800/30 hover:bg-gray-800 text-white transition-all hover:border-gray-600 cursor-pointer"
+                        onClick={(e) => handleSubmit(e, true)}
+                    >
                         <LoginIcon />
                         <span className="ml-2">Guest</span>
                     </button>

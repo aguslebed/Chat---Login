@@ -3,6 +3,7 @@ import UserRepository from "../repositories/userRepository";
 import bcrypt from "bcrypt";
 import { IUser, IUserModel } from "../models/userModel";
 import jwt from "jsonwebtoken";
+import { v4 as uuid } from "uuid";
 
 export class authService extends IAuthService {
     private userRepository: UserRepository;
@@ -68,4 +69,34 @@ export class authService extends IAuthService {
             throw error;
         }
     }
+    async getUsers(): Promise<IUserModel[]> {
+        try {
+            const users = await this.userRepository.findAll();
+            return users;
+        } catch (error) {
+            throw error;
+        }
+    }
+    async getGuest(): Promise<{ user: IUserModel, token: string }> {
+        const guestId = uuid();
+        const guestName = "Invitado_" + Math.floor(Math.random() * 9000 + 1000);
+
+        const token = jwt.sign(
+            { id: guestId, userName: guestName, isGuest: true },
+            process.env.JWT_SECRET!,
+            { expiresIn: "1h" }
+        );
+
+        return {
+            user: {
+                userName: guestName,
+                email: "",
+                password: "",
+                isActive: true,
+                _id: guestId,
+                isGuest: true
+            } as unknown as IUserModel,
+            token
+        };
+    };
 }
