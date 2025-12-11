@@ -6,21 +6,18 @@ const UserIcon = () => (
     </svg>
 );
 
-const UserList = ({ onUserClick }: { onUserClick?: (user: any) => void }) => {
-    // Mock data for now
-    const users = [
-        { id: 1, name: 'Alice', status: 'online' },
-        { id: 2, name: 'Bob', status: 'busy' },
-        { id: 3, name: 'Charlie', status: 'offline' },
-        { id: 4, name: 'David', status: 'online' },
-        { id: 5, name: 'Eve', status: 'busy' },
-        { id: 6, name: 'Frank', status: 'online' },
-        { id: 7, name: 'Grace', status: 'offline' },
-        { id: 8, name: 'Heidi', status: 'online' },
-        { id: 9, name: 'Ivan', status: 'busy' },
-        { id: 10, name: 'Judy', status: 'offline' },
-    ];
+interface User {
+    id: string | number;
+    name: string;
+    status: string;
+}
 
+interface UserListProps {
+    onUserClick?: (user: any) => void;
+    users?: User[];
+}
+
+const UserList = ({ onUserClick, users = [] }: UserListProps) => {
     return (
         <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
             <div className="p-4 border-b border-gray-800 flex-shrink-0">
@@ -45,9 +42,7 @@ const UserList = ({ onUserClick }: { onUserClick?: (user: any) => void }) => {
                             <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
                                 <UserIcon />
                             </div>
-                            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-900 ${user.status === 'online' ? 'bg-green-500' :
-                                user.status === 'busy' ? 'bg-red-500' : 'bg-gray-500'
-                                }`}></div>
+                            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-900 ${user.status === 'online' ? 'bg-green-500' : 'bg-gray-500'}`}></div>
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-200 group-hover:text-white truncate">

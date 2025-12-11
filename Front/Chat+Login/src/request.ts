@@ -2,10 +2,12 @@
 
 
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export async function login(email: string, password: string) {
     try {
 
-        const response = await fetch('http://localhost:3000/api/auth/login', {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -25,7 +27,7 @@ export async function login(email: string, password: string) {
 
 export async function register(email: string, password: string, userName: string) {
     try {
-        const response = await fetch('http://localhost:3000/api/auth/register', {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,7 +46,7 @@ export async function register(email: string, password: string, userName: string
 
 export async function getMe() {
     try {
-        const response = await fetch('http://localhost:3000/api/auth/me', {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -64,7 +66,7 @@ export async function getMe() {
 
 export async function logout() {
     try {
-        await fetch('http://localhost:3000/api/auth/logout', {
+        await fetch(`${API_URL}/api/auth/logout`, {
             method: 'POST',
             credentials: 'include',
         });
@@ -75,7 +77,7 @@ export async function logout() {
 
 export async function guestLogin() {
     try {
-        const response = await fetch('http://localhost:3000/api/auth/guest', {
+        const response = await fetch(`${API_URL}/api/auth/guest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

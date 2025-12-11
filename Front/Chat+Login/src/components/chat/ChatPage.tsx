@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import UserList from './UserList';
 import ChatArea from './ChatArea';
+import { socket } from '../../socket';
 
 const MenuIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -31,28 +32,92 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
 
 
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({
-        'global': [
-            { id: 1, user: 'Alice', text: 'Hey everyone!', time: '10:00 AM', isMe: false },
-            { id: 2, user: 'Me', text: 'Hi Alice! How are you?', time: '10:02 AM', isMe: true },
-        ]
+        'global': []
     });
+    const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+
+
+    useEffect(() => {
+        socket.connect();
+
+        socket.on('connect', () => {
+            console.log('Connected to socket server');
+            socket.emit('identify', currentUser);
+        });
+
+        socket.on('usersList', (users: any[]) => {
+            // Filter out self if desired, or keep all. Usually nice to see everyone including self or filter self.
+            // For now showing everyone.
+            setOnlineUsers(users);
+        });
+
+        socket.on('receiveMessage', (message: any) => {
+            const isMe = message.senderId && currentUser?._id && message.senderId === currentUser._id;
+
+            const newMessage: Message = {
+                id: message.id,
+                user: message.user,
+                text: message.text,
+                time: message.time,
+                isMe: isMe
+            };
+
+            const chatId = message.chatId || 'global';
+
+            setOpenChats(prevChats => {
+                // If it's a global chat, it's always open
+                if (chatId === 'global') return prevChats;
+
+                // Check if we already have this chat open
+                if (!prevChats.find(c => c.id === chatId)) {
+                    // It's a new private chat! We need to add it.
+                    // The message contains the user name, so use that.
+                    return [...prevChats, { id: chatId, name: message.user }];
+                }
+
+                return prevChats;
+            });
+
+            setMessagesByChat(prev => ({
+                ...prev,
+                [chatId]: [...(prev[chatId] || []), newMessage]
+            }));
+        });
+
+        return () => {
+            socket.off('connect');
+            socket.off('usersList');
+            socket.off('receiveMessage');
+            socket.disconnect();
+        };
+    }, [currentUser]);
 
     const handleSendMessage = (text: string) => {
         const newMessage: Message = {
             id: Date.now(),
-            user: 'Me', // You might want to use currentUser.userName here if available
+            user: currentUser?.userName || 'Me', // You might want to use currentUser.userName here if available
             text,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isMe: true
         };
 
+        // Optimistic update
         setMessagesByChat(prev => ({
             ...prev,
             [activeChat]: [...(prev[activeChat] || []), newMessage]
         }));
+
+        // Emit to server
+        socket.emit('sendMessage', {
+            chatId: activeChat,
+            text: text,
+            user: currentUser?.userName || 'Anonymous'
+        });
     };
 
     const handleUserClick = (user: any) => {
+        if (currentUser && user.id === currentUser._id) return;
+
         if (!openChats.find(c => c.id === user.id)) {
             setOpenChats([...openChats, { id: user.id, name: user.name }]);
         }
@@ -78,13 +143,13 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
             <div className={`fixed inset-0 z-50 lg:hidden ${isSidebarOpen ? 'block' : 'hidden'}`}>
                 <div className="absolute inset-0 bg-black/50" onClick={() => setIsSidebarOpen(false)}></div>
                 <div className="absolute inset-y-0 left-0 w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-300 ease-in-out h-full">
-                    <UserList onUserClick={handleUserClick} />
+                    <UserList onUserClick={handleUserClick} users={onlineUsers.filter(u => u.id !== currentUser?._id)} />
                 </div>
             </div>
 
             {/* Desktop Sidebar */}
             <div className="hidden lg:block h-full">
-                <UserList onUserClick={handleUserClick} />
+                <UserList onUserClick={handleUserClick} users={onlineUsers.filter(u => u.id !== currentUser?._id)} />
             </div>
 
             {/* Main Content */}
