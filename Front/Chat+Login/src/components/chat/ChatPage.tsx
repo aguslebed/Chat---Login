@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import UserList from './UserList';
+import ChatHistoryList from './ChatHistoryList';
 import ChatArea from './ChatArea';
 import { socket } from '../../socket';
-import { getGlobalMessages, getPrivateMessages } from '../../request';
+import { getGlobalMessages, getPrivateMessages, getConversations } from '../../request';
 
 const MenuIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -36,6 +37,7 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
         'global': []
     });
     const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+    const [historyChats, setHistoryChats] = useState<any[]>([]);
 
 
     useEffect(() => {
@@ -49,7 +51,22 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
             setMessagesByChat(prev => ({ ...prev, 'global': processed }));
         };
         loadGlobal();
-    }, [currentUser]); useEffect(() => {
+    }, [currentUser]);
+
+    useEffect(() => {
+        if (!currentUser) return;
+        const loadHistory = async () => {
+            // Only fetch history if NOT guest (since guests don't have persisted history anyway per new rule)
+            // But valid registered users do.
+            if (currentUser.isGuest) return;
+
+            const chats = await getConversations();
+            setHistoryChats(chats);
+        };
+        loadHistory();
+    }, [currentUser]);
+
+    useEffect(() => {
         socket.connect();
 
         socket.on('connect', () => {
@@ -255,6 +272,13 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
                     />
                 </div>
             </div>
+
+            {/* Right Sidebar - History */}
+            <div className="hidden xl:block h-full">
+                <ChatHistoryList onUserClick={handleUserClick} users={historyChats} />
+            </div>
+
+            {/* Mobile History Toggle? Need new UI logic for mobile if requested. For now, specific request "barra lateral a la derecha". Usually implies desktop. */}
         </div>
     );
 }

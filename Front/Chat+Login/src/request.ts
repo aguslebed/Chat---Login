@@ -146,3 +146,23 @@ export async function getPrivateMessages(userId: string) {
         return [];
     }
 }
+
+export async function getConversations() {
+    try {
+        const response = await fetch(`${API_URL}/api/messages/conversations`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+
+        if (!response.ok) return [];
+
+        const data = await response.json();
+        return data; // Assumes { id, name, status }
+    } catch (error) {
+        console.error("Error fetching conversations", error);
+        return [];
+    }
+}
