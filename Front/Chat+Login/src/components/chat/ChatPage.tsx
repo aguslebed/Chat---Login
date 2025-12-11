@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import UserList from './UserList';
 import ChatArea from './ChatArea';
 import { socket } from '../../socket';
+import { getGlobalMessages, getPrivateMessages } from '../../request';
 
 const MenuIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -38,6 +39,17 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
 
 
     useEffect(() => {
+        // Fetch Global History
+        const loadGlobal = async () => {
+            const msgs = await getGlobalMessages();
+            const processed = msgs.map((m: any) => ({
+                ...m,
+                isMe: currentUser && (m.senderId === currentUser.id || m.senderId === currentUser._id || m.user === currentUser.userName)
+            }));
+            setMessagesByChat(prev => ({ ...prev, 'global': processed }));
+        };
+        loadGlobal();
+    }, [currentUser]); useEffect(() => {
         socket.connect();
 
         socket.on('connect', () => {
@@ -52,7 +64,11 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
         });
 
         socket.on('receiveMessage', (message: any) => {
-            const isMe = message.senderId && currentUser?._id && message.senderId === currentUser._id;
+            // Check ID (preferred) or _id. Handle both cases.
+            const currentUserId = currentUser?.id || currentUser?._id;
+            const msgSenderId = message.senderId;
+
+            const isMe = msgSenderId && currentUserId && msgSenderId === currentUserId;
 
             const newMessage: Message = {
                 id: message.id,
@@ -116,11 +132,32 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
     };
 
     const handleUserClick = (user: any) => {
-        if (currentUser && user.id === currentUser._id) return;
+        const currentUserId = currentUser?.id || currentUser?._id;
+
+        if (currentUserId && user.id === currentUserId) return;
+
+        // Guest Check
+        if (currentUser?.isGuest) {
+            alert("Los invitados no pueden iniciar chats privados.");
+            return;
+        }
 
         if (!openChats.find(c => c.id === user.id)) {
             setOpenChats([...openChats, { id: user.id, name: user.name }]);
+            setOpenChats([...openChats, { id: user.id, name: user.name }]);
         }
+
+        // Fetch Private History
+        const loadPrivate = async () => {
+            const msgs = await getPrivateMessages(user.id);
+            const processed = msgs.map((m: any) => ({
+                ...m,
+                isMe: currentUser && (m.senderId === currentUser.id || m.senderId === currentUser._id)
+            }));
+            setMessagesByChat(prev => ({ ...prev, [user.id]: processed }));
+        };
+        loadPrivate();
+
         setActiveChat(user.id);
         setIsSidebarOpen(false); // Close sidebar on mobile
     };
@@ -143,13 +180,13 @@ export default function ChatPage({ currentUser, onLogout }: ChatPageProps) {
             <div className={`fixed inset-0 z-50 lg:hidden ${isSidebarOpen ? 'block' : 'hidden'}`}>
                 <div className="absolute inset-0 bg-black/50" onClick={() => setIsSidebarOpen(false)}></div>
                 <div className="absolute inset-y-0 left-0 w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-300 ease-in-out h-full">
-                    <UserList onUserClick={handleUserClick} users={onlineUsers.filter(u => u.id !== currentUser?._id)} />
+                    <UserList onUserClick={handleUserClick} users={onlineUsers.filter(u => u.id !== (currentUser?.id || currentUser?._id))} />
                 </div>
             </div>
 
             {/* Desktop Sidebar */}
             <div className="hidden lg:block h-full">
-                <UserList onUserClick={handleUserClick} users={onlineUsers.filter(u => u.id !== currentUser?._id)} />
+                <UserList onUserClick={handleUserClick} users={onlineUsers.filter(u => u.id !== (currentUser?.id || currentUser?._id))} />
             </div>
 
             {/* Main Content */}

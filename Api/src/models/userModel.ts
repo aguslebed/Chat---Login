@@ -23,6 +23,7 @@ const userSchema = new Schema<IUserModel>({
     },
     password: { type: String, required: true },
     isActive: { type: Boolean, default: true },
+    isGuest: { type: Boolean, default: false },
 }, { timestamps: true })
 
 

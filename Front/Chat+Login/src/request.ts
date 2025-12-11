@@ -92,3 +92,57 @@ export async function guestLogin() {
         return null;
     }
 }
+
+export async function getGlobalMessages() {
+    try {
+        const response = await fetch(`${API_URL}/api/messages/global`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+
+        if (!response.ok) return [];
+
+        const data = await response.json();
+        return data.map((msg: any) => ({
+            id: msg._id,
+            user: msg.senderName,
+            text: msg.content,
+            time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            senderId: msg.sender,
+            chatId: 'global'
+        }));
+    } catch (error) {
+        console.error("Error fetching global messages", error);
+        return [];
+    }
+}
+
+export async function getPrivateMessages(userId: string) {
+    try {
+        const response = await fetch(`${API_URL}/api/messages/private/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+
+        if (!response.ok) return [];
+
+        const data = await response.json();
+        return data.map((msg: any) => ({
+            id: msg._id,
+            user: msg.senderName,
+            text: msg.content,
+            time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            senderId: msg.sender,
+            chatId: userId
+        }));
+    } catch (error) {
+        console.error("Error fetching private messages", error);
+        return [];
+    }
+}

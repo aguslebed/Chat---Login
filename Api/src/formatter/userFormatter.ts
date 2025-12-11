@@ -7,5 +7,6 @@ export const userFormatter = (user: IUserModel) => {
         email: user.email,
         userName: user.userName,
         isActive: user.isActive,
+        isGuest: user.isGuest,
     }
 }
