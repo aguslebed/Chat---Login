@@ -25,6 +25,9 @@ export class UserRepository {
         return await userModel.find({ isActive: true });
     }
 
+    async findByIds(ids: string[]): Promise<IUserModel[]> {
+        return await userModel.find({ _id: { $in: ids }, isActive: true });
+    }
 }
 
 export default UserRepository

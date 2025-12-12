@@ -13,5 +13,6 @@ router.post("/logout", authController.logout);
 router.get("/me", authMiddleware, authController.me);
 router.get("/users", authMiddleware, authController.getUsers);
 router.post("/guest", authController.guestLogin);
+router.post("validateEmail", authController.validateEmail);
 
 export default router;

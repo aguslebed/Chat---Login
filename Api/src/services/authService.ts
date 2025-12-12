@@ -99,4 +99,16 @@ export class authService extends IAuthService {
             token
         };
     };
+
+    async validateEmail(email: string): Promise<IUserModel> {
+        try {
+            const user = await this.userRepository.findByEmail(email);
+            if (!user) {
+                throw new Error("User not found");
+            }
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

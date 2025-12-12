@@ -97,6 +97,16 @@ export const makeAuthController = ({ authService }: { authService: authService }
         }
     }
 
+    async function validateEmail(req: Request, res: Response) {
+        try {
+            const { email } = req.body;
+            const user = await authService.validateEmail(email);
+            res.status(200).json({ user });
+        } catch (error) {
+            res.status(500).json({ error: "Error al validar el email" });
+        }
+    }
+
 
     return {
         register,
@@ -104,6 +114,8 @@ export const makeAuthController = ({ authService }: { authService: authService }
         logout,
         me,
         getUsers,
-        guestLogin
+        guestLogin,
+        validateEmail
+
     }
 }

@@ -1,14 +1,14 @@
 import express from "express";
-import { getGlobalMessages, getPrivateMessages, getConversations } from "../controllers/messageController";
+import { makeMessageController } from "../controllers/makeMessageController";
+import { MessageService } from "../services/messageService";
 import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-// Allow public access to global? Or only authenticated? 
-// Requirement says "cargarse una vez que se inicia la sesion". Guest is a session too.
-// authMiddleware should handle both guest and registered if token is present.
-router.get("/global", authMiddleware, getGlobalMessages);
-router.get("/conversations", authMiddleware, getConversations);
-router.get("/private/:userId", authMiddleware, getPrivateMessages);
+const messageController = makeMessageController({ messageService: new MessageService() });
+
+router.get("/global", authMiddleware, messageController.getGlobalMessages);
+router.get("/conversations", authMiddleware, messageController.getConversations);
+router.get("/private/:userId", authMiddleware, messageController.getPrivateMessages);
 
 export default router;

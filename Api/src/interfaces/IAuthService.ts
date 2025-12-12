@@ -7,4 +7,5 @@ export class IAuthService {
     async me(): Promise<IUserModel> { throw new Error("Method not implemented"); };
     async getUsers(): Promise<IUserModel[]> { throw new Error("Method not implemented"); };
     async getGuest(): Promise<{ user: IUserModel, token: string }> { throw new Error("Method not implemented"); };
+    async validateEmail(email: string): Promise<IUserModel> { throw new Error("Method not implemented"); };
 }
