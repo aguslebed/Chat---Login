@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/auth/AuthPage';
 import ChatPage from './components/chat/ChatPage';
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
+import ResetPasswordPage from './components/auth/ResetPasswordPage';
 import { getMe, logout } from './request';
 import './App.css';
 
-function App() {
+function AppContent() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,13 +42,28 @@ function App() {
   }
 
   return (
-    <>
-      {!user ? (
-        <AuthPage onLoginSuccess={handleLoginSuccess} />
-      ) : (
-        <ChatPage currentUser={user} onLogout={handleLogout} />
-      )}
-    </>
+    <Routes>
+      <Route path="/" element={
+        !user ? (
+          <AuthPage onLoginSuccess={handleLoginSuccess} />
+        ) : (
+          <ChatPage currentUser={user} onLogout={handleLogout} />
+        )
+      } />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/register" element={<Navigate to="/" replace />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 

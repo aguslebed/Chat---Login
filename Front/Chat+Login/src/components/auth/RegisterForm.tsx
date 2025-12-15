@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { register } from '../../request';
+import { register, sendVerificationCode } from '../../request';
 
 const UserIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -21,14 +21,17 @@ const LockIcon = () => (
 
 
 export default function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
+    const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         email: '',
         username: '',
         password: '',
         confirmPassword: '',
+        verificationCode: ''
     });
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
@@ -36,7 +39,24 @@ export default function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () 
             return;
         }
 
-        const result = await register(formData.email, formData.password, formData.username);
+        setIsLoading(true);
+        const result = await sendVerificationCode(formData.email);
+        setIsLoading(false);
+
+        if (result && !result.error) {
+            alert(`Verification code sent to ${formData.email}`);
+            setStep(2);
+        } else {
+            alert(result?.error || 'Failed to send verification code');
+        }
+    };
+
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        setIsLoading(true);
+        const result = await register(formData.email, formData.password, formData.username, formData.verificationCode);
+        setIsLoading(false);
 
         if (result && !result.error) {
             alert('Registration successful! Please login.');
@@ -50,6 +70,51 @@ export default function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () 
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    if (step === 2) {
+        return (
+            <div className="w-full max-w-md mx-auto p-6">
+                <div className="text-center mb-10">
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-300 bg-clip-text text-transparent mb-2">Verify Email</h2>
+                    <p className="text-gray-400">Enter the 6-digit code sent to {formData.email}</p>
+                </div>
+
+                <form onSubmit={handleRegister} className="space-y-5">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <EnvelopeIcon />
+                        </div>
+                        <input
+                            type="text"
+                            name="verificationCode"
+                            required
+                            className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent text-white placeholder-gray-500 transition-all text-center tracking-widest text-xl"
+                            placeholder="000000"
+                            value={formData.verificationCode}
+                            onChange={handleChange}
+                            maxLength={6}
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full py-3 px-4 mt-4 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/20 transform transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? 'Verifying...' : 'Verify & Register'}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="w-full py-2 text-gray-400 hover:text-white transition-colors"
+                    >
+                        Back
+                    </button>
+                </form>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full max-w-md mx-auto p-6">
             <div className="text-center mb-10">
@@ -57,7 +122,7 @@ export default function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () 
                 <p className="text-gray-400">Join our community today</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSendCode} className="space-y-5">
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                         <EnvelopeIcon />
@@ -120,9 +185,10 @@ export default function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () 
 
                 <button
                     type="submit"
-                    className="w-full py-3 px-4 mt-4 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/20 transform transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    disabled={isLoading}
+                    className="w-full py-3 px-4 mt-4 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/20 transform transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Sign Up
+                    {isLoading ? 'Sending Code...' : 'Send Verification Code'}
                 </button>
             </form>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { login, guestLogin } from '../../request';
+import { Link } from 'react-router-dom';
 
 const LoginIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -19,7 +20,7 @@ const LockIcon = () => (
     </svg>
 );
 
-export default function LoginForm({ onSwitchToRegister, onForgotPassword, onLoginSuccess }: { onSwitchToRegister: () => void, onForgotPassword: () => void, onLoginSuccess: (data: any) => void }) {
+export default function LoginForm({ onSwitchToRegister, onLoginSuccess }: { onSwitchToRegister: () => void, onLoginSuccess: (data: any) => void }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -72,13 +73,12 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onLogi
                 </div>
 
                 <div className="flex justify-end">
-                    <button
-                        type="button"
-                        onClick={onForgotPassword}
+                    <Link
+                        to="/forgot-password"
                         className="text-sm text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
                     >
                         Forgot Password?
-                    </button>
+                    </Link>
                 </div>
 
                 <button

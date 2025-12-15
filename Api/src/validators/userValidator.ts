@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
 export const RegistrationValidator = (req: Request, res: Response, next: NextFunction) => {
-    const { email, password, userName } = req.body;
-    if (!email || !password || !userName) {
+    const { email, password, userName, verificationCode } = req.body;
+    if (!email || !password || !userName || !verificationCode) {
         return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -15,6 +15,19 @@ export const RegistrationValidator = (req: Request, res: Response, next: NextFun
     }
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email" });
+    }
+
+    next();
+}
+
+export const EmailValidator = (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ error: "Missing email" });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return res.status(400).json({ error: "Invalid email" });
     }
 

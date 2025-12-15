@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import ForgotPasswordForm from './ForgotPasswordForm';
 
-type AuthView = 'login' | 'register' | 'forgot-password';
+type AuthView = 'login' | 'register';
 
 export default function AuthPage({ onLoginSuccess }: { onLoginSuccess: (user: any) => void }) {
     const [view, setView] = useState<AuthView>('login');
@@ -37,15 +36,11 @@ export default function AuthPage({ onLoginSuccess }: { onLoginSuccess: (user: an
                     {view === 'login' && (
                         <LoginForm
                             onSwitchToRegister={() => setView('register')}
-                            onForgotPassword={() => setView('forgot-password')}
                             onLoginSuccess={handleLoginSuccess}
                         />
                     )}
                     {view === 'register' && (
                         <RegisterForm onSwitchToLogin={() => setView('login')} />
-                    )}
-                    {view === 'forgot-password' && (
-                        <ForgotPasswordForm onBackToLogin={() => setView('login')} />
                     )}
                 </div>
             </div>

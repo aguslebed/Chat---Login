@@ -25,14 +25,33 @@ export async function login(email: string, password: string) {
     }
 }
 
-export async function register(email: string, password: string, userName: string) {
+export async function register(email: string, password: string, userName: string, verificationCode: string) {
     try {
         const response = await fetch(`${API_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password, userName }),
+            body: JSON.stringify({ email, password, userName, verificationCode }),
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export async function sendVerificationCode(email: string) {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/send-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
             credentials: 'include',
         });
 
@@ -164,5 +183,40 @@ export async function getConversations() {
     } catch (error) {
         console.error("Error fetching conversations", error);
         return [];
+        return [];
     }
+}
+
+export async function forgotPassword(email: string) {
+    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || error.message || 'Failed to send reset email');
+    }
+
+    return await response.json();
+}
+
+export async function resetPassword(token: string, password: string) {
+    const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, password }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || error.message || 'Failed to reset password');
+    }
+
+    return await response.json();
 }

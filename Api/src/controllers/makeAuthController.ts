@@ -1,22 +1,24 @@
 import { Request, Response } from "express";
-import { authService } from "../services/authService";
-import { RegistrationValidator } from "../validators/userValidator";
+import { AuthService } from "../services/authService";
+import { RegistrationValidator, EmailValidator } from "../validators/userValidator";
 import { LoginValidator } from "../validators/loginValidator";
 import { userFormatter } from "../formatter/userFormatter";
 
-export const makeAuthController = ({ authService }: { authService: authService }) => {
+export const makeAuthController = ({ authService }: { authService: AuthService }) => {
 
     async function register(req: Request, res: Response) {
         try {
-            const { email, password, userName } = req.body;
+            const { email, password, userName, verificationCode } = req.body;
             console.log(email, password, userName)
             RegistrationValidator(req, res, async () => {
                 try {
-                    const user = await authService.register(email, password, userName);
+                    const user = await authService.register(email, password, userName, verificationCode);
                     res.status(201).json(user);
                 } catch (error: any) {
                     if (error.message === "Username already registered" || error.message === "Email already registered") {
                         res.status(409).json({ error: error.message });
+                    } else if (error.message === "Invalid or expired verification code") {
+                        res.status(400).json({ error: error.message });
                     } else {
                         res.status(500).json({ error: "Error al registrar el usuario" });
                     }
@@ -107,6 +109,54 @@ export const makeAuthController = ({ authService }: { authService: authService }
         }
     }
 
+    async function sendCode(req: Request, res: Response) {
+        try {
+            const { email } = req.body;
+            EmailValidator(req, res, async () => {
+                try {
+                    await authService.sendVerificationCode(email);
+                    res.status(200).json({ message: "Verification code sent" });
+                } catch (error: any) {
+                    if (error.message === "Email already registered") {
+                        res.status(409).json({ error: error.message });
+                    } else {
+                        console.error(error);
+                        res.status(500).json({ error: "Failed to send code" });
+                    }
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error sending code" });
+        }
+    }
+
+    async function forgotPassword(req: Request, res: Response) {
+        try {
+            const { email } = req.body;
+            await authService.forgotPassword(email);
+            res.status(200).json({ message: "Password reset email sent" });
+        } catch (error: any) {
+            if (error.message === "User not found") {
+                res.status(404).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Failed to process forgot password request" });
+            }
+        }
+    }
+
+    async function resetPassword(req: Request, res: Response) {
+        try {
+            const { token, password } = req.body;
+            await authService.resetPassword(token, password);
+            res.status(200).json({ message: "Password reset successfully" });
+        } catch (error: any) {
+            if (error.message === "Invalid or expired password reset token") {
+                res.status(400).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Failed to reset password" });
+            }
+        }
+    }
 
     return {
         register,
@@ -115,7 +165,10 @@ export const makeAuthController = ({ authService }: { authService: authService }
         me,
         getUsers,
         guestLogin,
-        validateEmail
 
+        validateEmail,
+        sendCode,
+        forgotPassword,
+        resetPassword
     }
 }

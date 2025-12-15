@@ -8,6 +8,8 @@ export interface IUser {
     isActive: boolean
     _id: string
     isGuest?: boolean
+    resetPasswordToken?: string
+    resetPasswordExpires?: Date
 }
 
 export interface IUserModel extends Omit<IUser, "_id">, Document { }
@@ -24,6 +26,8 @@ const userSchema = new Schema<IUserModel>({
     password: { type: String, required: true },
     isActive: { type: Boolean, default: true },
     isGuest: { type: Boolean, default: false },
+    resetPasswordToken: { type: String, required: false },
+    resetPasswordExpires: { type: Date, required: false },
 }, { timestamps: true })
 
 
