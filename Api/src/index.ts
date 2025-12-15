@@ -14,9 +14,18 @@ const app = express();
 
 connectDB();
 
+connectDB();
+
 app.use(morgan("dev"));
+
+// PNA (Private Network Access) support for Localhost <-> Vercel
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Private-Network", "true");
+    next();
+});
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true
 }));
 app.use(express.json());
@@ -29,7 +38,7 @@ const PORT = process.env.PORT || 4000;
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+        origin: process.env.FRONTEND_URL,
         credentials: true
     }
 });

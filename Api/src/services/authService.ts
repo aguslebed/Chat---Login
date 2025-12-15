@@ -163,7 +163,7 @@ export class AuthService implements IAuthService {
         user.resetPasswordExpires = resetPasswordExpires;
         await user.save();
 
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const frontendUrl = process.env.FRONTEND_URL;
         const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
         await this.emailService.sendPasswordResetEmail(email, resetLink);
     }
