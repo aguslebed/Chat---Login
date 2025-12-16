@@ -17,7 +17,10 @@ export async function login(email: string, password: string) {
         });
 
         const data = await response.json();
-        // Token is now in cookie, so we don't handle it here
+
+        if (data.token) {
+            localStorage.setItem('token', data.token);
+        }
         return data;
     } catch (error) {
         console.error(error);
@@ -46,6 +49,15 @@ export async function register(email: string, password: string, userName: string
 
 export async function sendVerificationCode(email: string) {
     try {
+        const token = localStorage.getItem('token');
+        const headers: any = {
+            'Content-Type': 'application/json',
+        };
+        // Some backends might require auth for sending code, though usually public. 
+        // But if user is re-verifying, it might help. Unlikely needed for registration but good practice if protected.
+        // Actually send-code is usually public. Leave as is?
+        // Wait, "sendVerificationCode" is for registration usually.
+        // Let's stick to getPrivateMessages which definitely needs it.
         const response = await fetch(`${API_URL}/api/auth/send-code`, {
             method: 'POST',
             headers: {
@@ -65,11 +77,15 @@ export async function sendVerificationCode(email: string) {
 
 export async function getMe() {
     try {
+        const token = localStorage.getItem('token');
+        const headers: any = {
+            'Content-Type': 'application/json',
+        };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await fetch(`${API_URL}/api/auth/me`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             credentials: 'include',
         });
 
@@ -151,11 +167,15 @@ export async function getGlobalMessages() {
 
 export async function getPrivateMessages(userId: string) {
     try {
+        const token = localStorage.getItem('token');
+        const headers: any = {
+            'Content-Type': 'application/json',
+        };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await fetch(`${API_URL}/api/messages/private/${userId}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             credentials: 'include',
         });
 

@@ -46,7 +46,7 @@ export const makeAuthController = ({ authService }: { authService: AuthService }
                         maxAge: 24 * 60 * 60 * 1000 // 1 day
                     });
 
-                    res.status(200).json({ user: formattedUser }); // Token is no longer in body
+                    res.status(200).json({ user: formattedUser, token }); // Token included for fallback
                 } catch (error: any) {
                     if (error.message === "User not found" || error.message === "Invalid password") {
                         res.status(401).json({ error: "Invalid credentials" });
