@@ -6,7 +6,7 @@ dotenv.config();
 export class EmailService {
     async sendVerificationCode(email: string, code: string): Promise<void> {
         try {
-            console.log(code)
+
             await sendEmail({
                 from: process.env.EMAIL_FROM || "onboarding@resend.dev", // Fallback to test domain if not set
                 to: "agus.lebed@gmail.com",
@@ -14,7 +14,7 @@ export class EmailService {
                 text: `Your verification code is: ${code}`,
                 html: `<b>Your verification code is: ${code}</b>`,
             });
-            console.log(`Verification code sent to ${email}`);
+
         } catch (error) {
             console.error("Error sending email:", error);
             throw new Error("Failed to send verification email");
@@ -35,7 +35,7 @@ export class EmailService {
                     <p>If you didn't request this, please ignore this email.</p>
                 `,
             });
-            console.log(`Password reset email sent to ${email} (redirected to admin)`);
+
         } catch (error) {
             console.error("Error sending password reset email:", error);
             throw new Error("Failed to send password reset email");

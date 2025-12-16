@@ -17,7 +17,7 @@ export default function ForgotPasswordForm({ onBackToLogin }: { onBackToLogin: (
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Reset password for:', email);
+
     };
 
     return (

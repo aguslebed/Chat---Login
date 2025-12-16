@@ -38,7 +38,7 @@ export const sendEmail = async (options: MailerOptions) => {
             throw new Error(`Resend Error: ${response.error.message}`);
         }
 
-        console.log('Email sent successfully:', response.data);
+
         return response.data;
     } catch (error) {
         console.error('Error sending email:', error);

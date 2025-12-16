@@ -31,7 +31,7 @@ export default function LoginForm({ onSwitchToRegister, onLoginSuccess }: { onSw
         const response = guest ? await guestLogin() : await login(email, password);
 
         if (response && (response.user || response.guest)) {
-            console.log(response)
+
             onLoginSuccess(response);
         }
     };

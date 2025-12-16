@@ -19,9 +19,6 @@ export default function AuthPage({ onLoginSuccess }: { onLoginSuccess: (user: an
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-purple-900/40 z-10" />
                 <div className="relative z-20 flex flex-col justify-center items-center text-center p-12">
                     <h1 className="text-5xl font-bold text-white mb-6">Welcome to Chat+</h1>
-                    <p className="text-xl text-gray-300 max-w-md">
-                        Connect with friends, share moments, and spark conversations in real-time.
-                    </p>
                 </div>
 
                 {/* Animated background blobs */}

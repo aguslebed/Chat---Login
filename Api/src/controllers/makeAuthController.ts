@@ -9,7 +9,7 @@ export const makeAuthController = ({ authService }: { authService: AuthService }
     async function register(req: Request, res: Response) {
         try {
             const { email, password, userName, verificationCode } = req.body;
-            console.log(email, password, userName)
+
             RegistrationValidator(req, res, async () => {
                 try {
                     const user = await authService.register(email, password, userName, verificationCode);
@@ -32,7 +32,7 @@ export const makeAuthController = ({ authService }: { authService: AuthService }
     async function login(req: Request, res: Response) {
         try {
             const { email, password } = req.body;
-            console.log(req.body)
+
             LoginValidator(req, res, async () => {
                 try {
                     const user = await authService.login(email, password);
