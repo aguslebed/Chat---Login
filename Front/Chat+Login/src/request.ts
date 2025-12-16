@@ -108,6 +108,7 @@ export async function guestLogin() {
 
         if (data.token) {
             document.cookie = `token=${data.token}; path=/; max-age=3600; samesite=lax`;
+            localStorage.setItem('token', data.token);
         }
 
         return data;
@@ -119,11 +120,15 @@ export async function guestLogin() {
 
 export async function getGlobalMessages() {
     try {
+        const token = localStorage.getItem('token');
+        const headers: any = {
+            'Content-Type': 'application/json',
+        };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await fetch(`${API_URL}/api/messages/global`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             credentials: 'include',
         });
 
@@ -173,11 +178,15 @@ export async function getPrivateMessages(userId: string) {
 
 export async function getConversations() {
     try {
+        const token = localStorage.getItem('token');
+        const headers: any = {
+            'Content-Type': 'application/json',
+        };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await fetch(`${API_URL}/api/messages/conversations`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             credentials: 'include',
         });
 
