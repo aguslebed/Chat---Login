@@ -49,15 +49,6 @@ export async function register(email: string, password: string, userName: string
 
 export async function sendVerificationCode(email: string) {
     try {
-        const token = localStorage.getItem('token');
-        const headers: any = {
-            'Content-Type': 'application/json',
-        };
-        // Some backends might require auth for sending code, though usually public. 
-        // But if user is re-verifying, it might help. Unlikely needed for registration but good practice if protected.
-        // Actually send-code is usually public. Leave as is?
-        // Wait, "sendVerificationCode" is for registration usually.
-        // Let's stick to getPrivateMessages which definitely needs it.
         const response = await fetch(`${API_URL}/api/auth/send-code`, {
             method: 'POST',
             headers: {
