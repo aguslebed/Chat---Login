@@ -78,7 +78,9 @@ export const socketController = (io: Server) => {
             // Likely means: Messages SENT BY Guest or SENT TO Guest should not be saved.
             // Messages sent by Registered to Global SHOULD be saved.
 
-            const shouldSave = !isSenderGuest && !isRecipientGuest;
+            const isGlobalChat = chatId === 'global';
+            // Save if it is global chat OR if no guest is involved in private chat
+            const shouldSave = isGlobalChat || (!isSenderGuest && !isRecipientGuest);
 
             if (shouldSave) {
                 try {
