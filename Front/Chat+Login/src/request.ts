@@ -105,6 +105,11 @@ export async function guestLogin() {
         });
 
         const data = await response.json();
+
+        if (data.token) {
+            document.cookie = `token=${data.token}; path=/; max-age=3600; samesite=lax`;
+        }
+
         return data;
     } catch (error) {
         console.error(error);

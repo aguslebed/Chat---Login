@@ -38,7 +38,7 @@ export class MessageService extends IMessageService {
         const results = partners.map(u => ({
             id: u._id,
             name: u.userName,
-            status: 'offline' // We don't track real-time status here easily
+            status: 'offline'
         }));
 
         return results;
