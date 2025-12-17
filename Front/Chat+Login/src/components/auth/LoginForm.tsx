@@ -100,13 +100,6 @@ export default function LoginForm({ onSwitchToRegister, onLoginSuccess }: { onSw
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
-                    <button className="flex items-center justify-center px-4 py-2 border border-gray-700 rounded-xl bg-gray-800/30 hover:bg-gray-800 text-white transition-all hover:border-gray-600 cursor-pointer">
-                        {/* Simple G icon */}
-                        <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .533 5.347.533 12S5.867 24 12.48 24c3.44 0 6.04-1.133 7.973-3.267 1.947-2.133 2.48-5.32 2.48-7.813 0-.693-.053-1.4-.16-2H12.48z" />
-                        </svg>
-                        Google
-                    </button>
                     <button className="flex items-center justify-center px-4 py-2 border border-gray-700 rounded-xl bg-gray-800/30 hover:bg-gray-800 text-white transition-all hover:border-gray-600 cursor-pointer"
                         onClick={(e) => handleSubmit(e, true)}
                     >
