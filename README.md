@@ -39,9 +39,3 @@ cd Front/Chat+Login
 npm install
 npm run dev
 ```
-
-**Cómo probar las principales funcionalidades**
-- Crear una cuenta desde el frontend o llamar al endpoint de registro del backend.
-- Completar la verificación con el código recibido por correo (o examinar logs si se usa un servicio SMTP de pruebas).
-- Iniciar sesión y acceder a la zona de chat; abrir varias ventanas para comprobar mensajería en tiempo real.
-- Probar recuperación de contraseña solicitando un código y completando el restablecimiento.
